@@ -1,0 +1,313 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+        integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+        crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+    <section id="Content">
+        <div class="container position-absolute top-50 start-50 translate-middle">
+            <div class="card shadow-sm">
+                <div class="card-body" id="readInput">
+                    <div id="startMenu">
+                        <h1 class="text-center">Start The Game</h1>
+                        <hr>
+                        <div class="text-center">
+                            <button class="btn btn-secondary btn-lg" id="btn" onclick="startGame(1)">Ez</button>
+                            <button class="btn btn-secondary btn-lg" id="btn" onclick="startGame(2)">Med</button>
+                            <button class="btn btn-secondary btn-lg" id="btn" onclick="startGame(3)">Git Gud</button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-evenly" id="gamePlay">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="Footer">
+        <div class="container-fluid fixed-bottom">
+            <div class="row">
+                <div class="col-sm-5">
+                    <br>
+                    <br>
+                </div>
+                <div class="col-sm-2">
+                    <div class="time border shadow-sm rounded">
+                        <h3 class="text-center my-1" id="countdown">00:00</h3>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <p class="my-0 fw-bold" id="additionText"></p>
+                    <p class="my-0 fw-bold" id="minusText"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Deklarasi Variabel
+
+        let startingMinutes = 0; // Untuk Jumlah Menit
+        let time = 0; // Untuk Hasil Konversi Dari Menit ke Detik
+        let minutes = 0;
+        let second = 0;
+        let addition = false; // Untuk Memberitahu Pertambahan Waktu
+        let minus = false; // Untuk Memberitahu Pengurangan Waktu
+        let refreshInterval; // Untuk Menyimpan Fungsi setInterval
+
+        let countdownEl = document.getElementById('countdown');
+        let startMenu = document.getElementById("startMenu");
+        let gamePlay = document.getElementById("gamePlay");
+
+        let indexNeedOne = 0; // Untuk Menyimpan Value Untuk Gambar 1
+        let indexNeedTwo = 0; // Untuk Menyimpan Value Untuk Gambar 2
+        let indexNeedThree = 0; // Untuk Menyimpan Value Untuk Gambar 3
+        let indexNeedFour = 0; // Untuk Menyimpan Value Untuk Gambar 4
+
+        let indexNeed = []; // Untuk Menampung Value Gambar
+        let inputNeed = []; // Untuk Menampung Class Gambar
+
+        let i = 0; // Untuk Membantu Validasi Input Terhadap Gambar
+
+        let score = 0; // Untuk Menampung Skor
+
+        var all_correct = new Audio('sfx/all_correct.mp3');
+        var wrong_answear = new Audio('sfx/wrong_answear.mp3');
+
+        let additionText = document.getElementById("additionText");
+        let minusText = document.getElementById("minusText");
+
+        function startGame(difficulty) {
+
+            // Validasi Kesulitan 
+            if (difficulty == 1){
+                startingMinutes = 0.5;
+                time = startingMinutes * 60
+            } else if (difficulty == 2){
+                startingMinutes = 0.25;
+                time = startingMinutes * 60
+            } else if (difficulty == 3){
+                startingMinutes = 0.1
+                time = startingMinutes * 60
+            }
+
+            startMenu.innerHTML = "";
+            gamePlay.innerHTML = `
+                        <div class="rounded-circle border shadow-sm p-3 inputNeed">
+                            <span id="inputNeedOne">
+
+                            </span>
+                        </div>
+                        <div class="rounded-circle border shadow-sm p-3 inputNeed">
+                            <span id="inputNeedTwo">
+
+                            </span>
+                        </div>
+                        <div class="rounded-circle border shadow-sm p-3 inputNeed">
+                            <span id="inputNeedThree">
+
+                            </span>
+                        </div>
+                        <div class="rounded-circle border shadow-sm p-3 inputNeed">
+                            <span id="inputNeedFour">
+
+                            </span>
+                        </div>`
+
+            inputNeed = document.getElementsByClassName("inputNeed");
+            let read = document.getElementById("readInput");
+
+            let inputNeedOne = document.getElementById("inputNeedOne");
+            let inputNeedTwo = document.getElementById("inputNeedTwo");
+            let inputNeedThree = document.getElementById("inputNeedThree");
+            let inputNeedFour = document.getElementById("inputNeedFour");
+
+            indexNeedOne = randomNumber();
+            indexNeedTwo = randomNumber();
+            indexNeedThree = randomNumber();
+            indexNeedFour = randomNumber();
+
+            indexNeed = [indexNeedOne, indexNeedTwo, indexNeedThree, indexNeedFour];
+
+            console.log(indexNeed);
+            console.log(inputNeed);
+
+            inputNeedOne.innerHTML = randomArrow(indexNeedOne);
+            inputNeedTwo.innerHTML = randomArrow(indexNeedTwo);
+            inputNeedThree.innerHTML = randomArrow(indexNeedThree);
+            inputNeedFour.innerHTML = randomArrow(indexNeedFour);
+
+            read.focus()
+
+            read.addEventListener("keypress", readKeyInput())
+
+            refreshInterval = setInterval(timerCountdown, 1000);
+
+        }
+
+        function randomNumber() {
+            return Math.floor(Math.random() * 4);
+        }
+
+        // Function Random Arrow
+        function randomArrow(indexArrow) {
+            let result = " ";
+            switch (indexArrow) {
+                case 0:
+                    result = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+</svg>`;
+                    return result;
+                    break;
+                case 1:
+                    result = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+</svg>`;
+                    return result;
+                    break;
+                case 2:
+                    result = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+</svg>`;
+                    return result;
+                    break;
+                case 3:
+                    result = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+</svg>`;
+                    return result;
+                    break;
+            }
+        }
+
+        // Timer Code and Function Timer
+        function timerCountdown() {
+            if(addition == true && minus == false) {
+                time += 2;
+                addition = false;
+                minus = false;
+                additionText.textContent = "2+";
+                additionText.style.color = "green";
+                minusText.textContent = "";
+            } else if (addition == true && minus == true){
+                time++;
+                addition = false;
+                minus = false;
+                additionText.textContent = "1+";
+                additionText.style.color = "green";
+                minusText.textContent = "";
+            } else if (addition == false && minus == true){
+                time--;
+                addition = false;
+                minus = false;
+                minusText.textContent = "1-";
+                minusText.style.color = "red";
+                additionText.textContent = "";
+            } else {
+                minusText.textContent = "";
+                additionText.textContent = "";
+            }
+
+            minutes = Math.floor(time / 60);
+            seconds = time % 60;
+
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+
+            countdownEl.innerHTML = `${minutes}:${seconds}`;
+            time--;
+
+            if (time < 0) {
+                clearInterval(refreshInterval);
+                startMenu.innerHTML = `
+                    <h1 class="text-center">Game Over</h1>
+                    <hr>
+                    <h6 class="text-center">Score Anda</h6>
+                    <h1 class="text-center">${score}</h1>
+                    <hr>
+                    <div class="text-center">
+                        <button class="btn btn-secondary btn-lg" id="btn" onclick="location.reload()">Restart</button>
+                    </div>
+                `;
+                gamePlay.innerHTML = ``;
+            }
+        }
+
+        function readKeyInput() {
+
+            document.addEventListener('keydown', (event) => {
+                var name = event.key;
+                var code = event.code;
+                if (event.key == "ArrowDown") {
+                    checkInput(0);
+                } else if (event.key == "ArrowRight") {                  
+                    checkInput(1);
+                } else if (event.key == "ArrowUp") {         
+                    checkInput(2);
+                } else if (event.key == "ArrowLeft") {  
+                    checkInput(3);
+                }
+            }, false);
+
+        }
+
+        function checkInput(inputIndex) {
+
+            if (inputIndex == indexNeed[i]) {
+                inputNeed[i].style.backgroundColor = "green";
+                score = score + 25;
+                if (i < 4) {
+                    i++;
+                }
+            } else {
+                minus = true;
+                inputNeed[i].style.backgroundColor = "red";
+                wrong_answear.play();
+                if (i < 4) {
+                    i++;
+                }
+            }
+
+            if(i == 4){
+                addition = true
+                all_correct.play();
+                indexNeedOne = randomNumber();
+                indexNeedTwo = randomNumber();
+                indexNeedThree = randomNumber();
+                indexNeedFour = randomNumber();
+
+                indexNeed = [indexNeedOne, indexNeedTwo, indexNeedThree, indexNeedFour];
+
+                console.log(indexNeed);
+
+                inputNeedOne.innerHTML = randomArrow(indexNeedOne);
+                inputNeedTwo.innerHTML = randomArrow(indexNeedTwo);
+                inputNeedThree.innerHTML = randomArrow(indexNeedThree);
+                inputNeedFour.innerHTML = randomArrow(indexNeedFour);
+
+                for(i >= 0; i--;){
+                    inputNeed[i].style.backgroundColor = "transparent";
+                }
+                i = 0;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
